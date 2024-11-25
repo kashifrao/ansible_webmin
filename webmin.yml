@@ -1,0 +1,38 @@
+
+    - name: Create Webmin directory
+      ansible.builtin.file:
+        path: /usr/src/webmin
+        state: directory
+        owner: ansible-c
+        group: ans-admin
+        mode: 0775
+      become_user: root
+
+    - name: "Copy Webmin Installed File"
+      copy:
+        src:  "{{ansible_roles_path}}/files/webmin/webmin-setup-repos.sh"
+        dest: /usr/src/webmin/
+        owner: ansible-c
+        group: ans-admin
+        mode: '755'
+      become_user: root
+
+
+    - name: Initiaze the webmin bash file
+      shell: sudo sh /usr/src/webmin/webmin-setup-repos.sh Y 
+      become_user: root
+
+    - name: Install Webmin via dnf
+      yum:
+        name:
+          - webmin
+        state: present
+      become_user: root
+
+    - name: Restart Webmin Service
+      systemd:
+        name: webmin
+        state: restarted
+        enabled: yes
+      become_user: root 
+
